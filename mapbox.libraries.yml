@@ -1,0 +1,17 @@
+mapboxgl:
+  remote: http://mapbox.com/
+  version: 0.51
+  header: true
+  license:
+    name: 3-Clause BSD
+    url: https://github.com/mapbox/mapbox-gl-js/blob/master/LICENSE.txt
+    gpl-compatible: true
+  js:
+    https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js: {}
+  css:
+    component:
+      https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css: {}
+mapbox:
+  version: 1.x
+  js:
+    js/mapbox.js: {}

@@ -1,0 +1,16 @@
+{
+  "name": "drupal/mapbox",
+  "type": "drupal-module",
+  "description": "Mapbox Drupal 8 integration.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/mapbox",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/mapbox",
+    "source": "http://cgit.drupalcode.org/mapbox"
+  },
+  "require": {
+    "drupal/geofield": "^1.0@beta"
+  }
+}
