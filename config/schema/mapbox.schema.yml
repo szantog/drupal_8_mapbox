@@ -1,0 +1,26 @@
+mapbox.mapbox.*:
+  type: config_entity
+  label: 'Mapbox config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    access_token:
+      type: string
+      label: 'Access Token'
+    style:
+      type: string
+      label: 'Style'
+    center:
+      type: mapping
+      label: 'Center'
+      mapping:
+        x:
+          type: float
+          label: 'Center X'
+        y:
+          type: float
+          label: 'Center Y'

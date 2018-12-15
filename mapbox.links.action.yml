@@ -1,0 +1,6 @@
+entity.mapbox.add_form:
+  route_name: entity.mapbox.add_form
+  title: 'Add Mapbox'
+  appears_on:
+    - entity.mapbox.collection
+

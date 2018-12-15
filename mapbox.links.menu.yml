@@ -1,0 +1,9 @@
+
+# Mapbox menu items definition
+entity.mapbox.collection:
+  title: 'Mapbox'
+  route_name: entity.mapbox.collection
+  description: 'List Mapbox (bundles)'
+  parent: system.admin_structure
+  weight: 99
+
