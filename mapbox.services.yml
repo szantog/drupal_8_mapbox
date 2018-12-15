@@ -1,0 +1,4 @@
+services:
+  mapbox.builder:
+    class: Drupal\mapbox\MapboxBuilder
+    arguments: ['@config.factory', '@config.storage']
