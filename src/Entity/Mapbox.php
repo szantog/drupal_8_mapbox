@@ -2,6 +2,7 @@
 
 namespace Drupal\mapbox\Entity;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 
 /**
@@ -52,5 +53,9 @@ class Mapbox extends ConfigEntityBase implements MapboxInterface {
    * @var string
    */
   protected $label;
+
+  public function getHtmlId() {
+    return Html::getUniqueId($this->id);
+  }
 
 }

@@ -9,5 +9,8 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
  */
 interface MapboxInterface extends ConfigEntityInterface {
 
-  // Add get/set methods for your configuration properties here.
+  /**
+   * Get a string for use as a valid HTML ID of a map and guarantees uniqueness.
+   */
+  public function getHtmlId();
 }

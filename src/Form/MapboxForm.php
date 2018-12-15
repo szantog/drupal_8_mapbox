@@ -48,7 +48,7 @@ class MapboxForm extends EntityForm {
       '#type' => 'textfield',
       '#title' => $this->t('Style'),
       '#maxlength' => 60,
-      '#default_value' => $mapbox->label(),
+      '#default_value' => !empty($mapbox->style) ? $mapbox->style : '',
       '#description' => $this->t("To load a style from the Mapbox API, you can use a URL of the form mapbox://styles/:owner/:style, where :owner is your Mapbox account name and :style is the style ID. Or you can use one of the <a href='https://www.mapbox.com/maps/'>predefined Mapbox styles</a>.<br>Tilesets hosted with Mapbox can be style-optimized if you append ?optimize=true to the end of your style URL, like mapbox://styles/mapbox/streets-v9?optimize=true. Learn more about style-optimized vector tiles in our <a href='https://www.mapbox.com/api-documentation/#retrieve-tiles'>API documentation</a>."),
       '#required' => TRUE,
     ];
@@ -57,25 +57,36 @@ class MapboxForm extends EntityForm {
       '#type' => 'fieldset',
       '#title' => $this->t('Center'),
       '#description' => $this->t('The inital geographical centerpoint of the map. If  center is not specified in the constructor options, Mapbox GL JS will look for it in the map\'s style object. If it is not specified in the style, either, it will default to  [0, 0] Note: Mapbox GL uses longitude, latitude coordinate order (as opposed to latitude, longitude) to match GeoJSON.'),
+      '#tree' => TRUE,
     ];
 
     $form['center']['x'] = [
       '#type' => 'textfield',
       '#field_prefix' => $this->t('X: '),
       '#maxlength' => 8,
-      '#default_value' => $mapbox->get('center.x'),
-      '#tree' => TRUE,
+      '#default_value' => !empty($mapbox->center['x']) ? $mapbox->center['x'] : '',
     ];
 
     $form['center']['y'] = [
       '#type' => 'textfield',
       '#field_prefix' => $this->t('Y: '),
       '#maxlength' => 8,
-      '#default_value' => $mapbox->get('center.x'),
-      '#tree' => TRUE,
+      '#default_value' => !empty($mapbox->center['y']) ? $mapbox->center['y'] : '',
+    ];
+
+    $form['zoom'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Zoom'),
+      '#maxlength' => 8,
+      '#default_value' => !empty($mapbox->zoom) ? $mapbox->zoom : '',
+      '#description' => $this->t('he initial zoom level of the map. If  zoom is not specified in the constructor options, Mapbox GL JS will look for it in the map\'s style object. If it is not specified in the style, either, it will default to  0 .')
     ];
 
     return $form;
+  }
+
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    $mapbox = $this->entity;
   }
 
   /**
