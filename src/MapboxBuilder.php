@@ -49,23 +49,45 @@ class MapboxBuilder implements MapboxBuilderInterface {
     return $this->maps;
   }
 
-  private function preprocessMap(Mapbox $config) {
-    $html_id = $config->getHtmlId();
-    $build = $config;
-
-    if (!empty($build['center'])) {
-      $x = !empty($build['center']['x']) ? $build['center']['x'] : 0;
-      $y = !empty($build['center']['y']) ? $build['center']['y'] : 0;
-      $build['center'] = "[$x, $y]";
+  public function preprocessMap(&$variables, Mapbox $mapbox) {
+    $variables['html_id'] = $mapbox->getHtmlId();
+    $variables['mapbox_id'] = $mapbox->id();
+    $variables['label'] = $mapbox->label();
+    $variables['access_token'] = $mapbox->access_token;
+    $variables['style'] = $mapbox->style;
+    $variables['zoom'] = $mapbox->zoom;
+    $variables['width'] = $variables["children"]["#width"];
+    $variables['height'] = $variables["children"]["#height"];
+    $center = $mapbox->get('center');
+    if (!empty($center)) {
+      $variables['center'] = "[{$center['x']}, {$center['y']}]";
     }
   }
 
   public function preprocessMaps () {
     $mapboxes = [];
-    foreach ($this->mapConfigs as $config) {
+    foreach ($this->maps as $config) {
       $mapboxes[] = $this->preprocessMap($config);
     }
 
     return $mapboxes;
+  }
+
+  public function renderMap(Mapbox $mapbox, $width='100%', $height = 'auto', $data = NULL) {
+    $build['html'] = [
+      '#theme' => 'mapbox',
+      '#mapbox' => $mapbox,
+      '#data' => $data,
+      '#width' => $width,
+      '#height' => $height,
+      '#attached' => [
+        'library' => [
+          'mapbox/mapboxgl',
+          //'mapbox/mapbox',
+        ],
+      ],
+    ];
+
+    return $build;
   }
 }

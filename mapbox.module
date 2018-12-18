@@ -33,3 +33,10 @@ function mapbox_theme() {
     ],
   ];
 }
+
+function template_preprocess_mapbox(&$variables) {
+  /** @var \Drupal\mapbox\MapboxBuilder $mapbox_service */
+  $mapbox_service = Drupal::service('mapbox.builder');
+
+  $mapbox_service->preprocessMap($variables, $variables["children"]["#mapbox"]);
+}

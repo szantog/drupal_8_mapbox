@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldItemInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\mapbox\MapboxBuilder;
 
 /**
  * Plugin implementation of the 'mapbox_formatter' formatter.
@@ -26,13 +27,16 @@ class MapboxFormatter extends FormatterBase {
    */
   protected $config_factory;
 
+  /** @var \Drupal\Core\Config\ImmutableConfig */
+  protected $mapboxConfig;
+
   /** @var \Drupal\mapbox\MapboxBuilder $mapboxBuilder */
   protected $mapboxBuilder;
 
-  /** @var mixed|null  */
+  /** @var mixed|null */
   protected $mapboxId;
 
-  /** @var \Drupal\mapbox\Entity\Mapbox  */
+  /** @var \Drupal\mapbox\Entity\Mapbox */
   protected $mapbox;
 
   public function __construct($plugin_id, $plugin_definition, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, array $settings, string $label, string $view_mode, array $third_party_settings) {
@@ -41,11 +45,11 @@ class MapboxFormatter extends FormatterBase {
     $this->mapboxBuilder = \Drupal::service('mapbox.builder');
 
     if (!empty($this->getSetting('mapbox_id'))) {
+      $this->mapboxConfig = $this->config_factory->get($this->getSetting('mapbox_id'));
       $this->mapboxId = $this->getSetting('mapbox_id');
-      $map_config = $this->config_factory->loadMultiple(["mapbox.mapbox.$this->mapbox_id"]);
       $this->mapbox = \Drupal::service('entity_type.manager')
         ->getStorage('mapbox')
-        ->load($this->mapbox_id);
+        ->load($this->mapboxId);
     }
   }
 
@@ -54,8 +58,10 @@ class MapboxFormatter extends FormatterBase {
    */
   public static function defaultSettings() {
     return [
-      'mapbox_id' => NULL,
-    ] + parent::defaultSettings();
+        'mapbox_id' => NULL,
+        'width' => NULL,
+        'height' => NULL,
+      ] + parent::defaultSettings();
   }
 
   /**
@@ -63,14 +69,26 @@ class MapboxFormatter extends FormatterBase {
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
     return [
-      'mapbox_id' => [
-        '#type' => 'select',
-        '#title' => $this->t('Select Mapbox configuration'),
-        '#options' => $this->getMapConfigs(),
-        '#default_value' => $this->mapbox_id,
-        '#required' => TRUE,
-      ],
-    ] + parent::settingsForm($form, $form_state);
+        'mapbox_id' => [
+          '#type' => 'select',
+          '#title' => $this->t('Select Mapbox configuration'),
+          '#options' => $this->getMapConfigs(),
+          '#default_value' => $this->mapboxId,
+          '#required' => TRUE,
+        ],
+        'width' => [
+          '#title' => $this->t('Width'),
+          '#type' => 'textfield',
+          '#maxlength' => 8,
+          '#default_value' => !empty($this->getSetting('width')) ? $this->getSetting('width') : '',
+        ],
+        'height' => [
+          '#title' => $this->t('Width'),
+          '#type' => 'textfield',
+          '#maxlength' => 8,
+          '#default_value' => !empty($this->getSetting('height')) ? $this->getSetting('height') : '',
+        ],
+      ] + parent::settingsForm($form, $form_state);
   }
 
   /**
@@ -79,8 +97,8 @@ class MapboxFormatter extends FormatterBase {
   public function settingsSummary() {
     $summary = [];
     $configs = $this->getMapConfigs();
-    if (isset($configs[$this->mapbox_id])) {
-      $summary = [$this->t('Mapbox configuration: @mapbox_label', ['@mapbox_label' => $configs[$this->mapbox_id]])] ;
+    if (isset($configs[$this->mapboxId])) {
+      $summary = [$this->t('Mapbox configuration: @mapbox_label', ['@mapbox_label' => $configs[$this->mapboxId]])];
     }
 
     return $summary;
@@ -90,7 +108,7 @@ class MapboxFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    if (!$this->map_config) {
+    if (!$this->mapbox) {
       return [
         '#markup' => $this->t('No Mapbox configuration set.')
       ];
@@ -115,22 +133,7 @@ class MapboxFormatter extends FormatterBase {
    *   The textual output generated.
    */
   protected function viewValue(FieldItemInterface $item) {
-    $build['html'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'div',
-      '#value' => '<div id="map" style="width: 400px; height: 300px"></div>',
-      '#attached' => [
-        'library' => [
-          'mapbox/mapboxgl',
-          'mapbox/mapbox',
-        ],
-      ],
-    ];
-
-
-
-
-    return $build;
+    return $this->mapboxBuilder->renderMap($this->mapbox, $this->getSetting('width'), $this->getSetting('height'), $item->latlon);
   }
 
   /**

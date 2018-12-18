@@ -38,8 +38,8 @@ class MapboxForm extends EntityForm {
     $form['access_token'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Access token'),
-      '#maxlength' => 60,
-      '#default_value' => $mapbox->label(),
+      '#maxlength' => 120,
+      '#default_value' => !empty($mapbox->access_token) ? $mapbox->access_token : '',
       '#description' => $this->t("The map's access token. To get access token register on the <a href='https://www.mapbox.com'>Mapbox</a> site."),
       '#required' => TRUE,
     ];
