@@ -72,7 +72,7 @@ class MapboxFormatter extends FormatterBase {
         'mapbox_id' => [
           '#type' => 'select',
           '#title' => $this->t('Select Mapbox configuration'),
-          '#options' => $this->getMapConfigs(),
+          '#options' => $this->mapboxBuilder->getMapConfigs(),
           '#default_value' => $this->mapboxId,
           '#required' => TRUE,
         ],
@@ -133,20 +133,12 @@ class MapboxFormatter extends FormatterBase {
    *   The textual output generated.
    */
   protected function viewValue(FieldItemInterface $item) {
-    return $this->mapboxBuilder->renderMap($this->mapbox, $this->getSetting('width'), $this->getSetting('height'), $item->latlon);
-  }
-
-  /**
-   * Build a key => label array from all Mapbox configuration.
-   */
-  private function getMapConfigs() {
-    $configs = $this->config_factory->loadMultiple($this->config_factory->listAll('mapbox'));
-    $return = [];
-    /** @var \Drupal\Core\Config\ImmutableConfig $config */
-    foreach ($configs as $config) {
-      $return[$config->get('id')] = $config->get('label');
-    }
-
-    return $return;
+    $html_id = $this->mapbox->getHtmlId();
+    return $this->mapboxBuilder->renderMap($this->mapbox, $this->getSetting('width'), $this->getSetting('height'), $html_id, [
+      [
+        $item->lon,
+        $item->lat,
+      ]
+    ]);
   }
 }

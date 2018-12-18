@@ -38,7 +38,6 @@ class MapboxBuilder implements MapboxBuilderInterface {
   public function __construct(ConfigFactoryInterface $config_factory, CachedStorage $config_storage) {
     $this->configFactory = $config_factory;
     $this->configStorage = $config_storage;
-    $this->maps = [];
   }
 
   public function addMap(Mapbox $mapbox) {
@@ -50,7 +49,7 @@ class MapboxBuilder implements MapboxBuilderInterface {
   }
 
   public function preprocessMap(&$variables, Mapbox $mapbox) {
-    $variables['html_id'] = $mapbox->getHtmlId();
+    $variables['html_id'] = $variables["children"]["#html_id"];
     $variables['mapbox_id'] = $mapbox->id();
     $variables['label'] = $mapbox->label();
     $variables['access_token'] = $mapbox->access_token;
@@ -64,7 +63,7 @@ class MapboxBuilder implements MapboxBuilderInterface {
     }
   }
 
-  public function preprocessMaps () {
+  public function preprocessMaps() {
     $mapboxes = [];
     foreach ($this->maps as $config) {
       $mapboxes[] = $this->preprocessMap($config);
@@ -73,21 +72,41 @@ class MapboxBuilder implements MapboxBuilderInterface {
     return $mapboxes;
   }
 
-  public function renderMap(Mapbox $mapbox, $width='100%', $height = 'auto', $data = NULL) {
+  public function renderMap(Mapbox $mapbox, $width = '100%', $height = 'auto', $html_id='', $data = NULL) {
+    $settings[$html_id] = [
+      'data' => $data,
+      'mapbox' => $mapbox,
+    ];
     $build['html'] = [
       '#theme' => 'mapbox',
       '#mapbox' => $mapbox,
       '#data' => $data,
       '#width' => $width,
       '#height' => $height,
+      '#html_id' => $html_id,
       '#attached' => [
         'library' => [
           'mapbox/mapboxgl',
-          //'mapbox/mapbox',
+          'mapbox/mapbox',
         ],
+        'drupalSettings' => ['mapbox' => $settings],
       ],
     ];
 
     return $build;
+  }
+
+  /**
+   * Build a key => label array from all Mapbox configuration.
+   */
+  public function getMapConfigs() {
+    $configs = $this->configFactory->loadMultiple($this->configFactory->listAll('mapbox'));
+    $return = [];
+    /** @var \Drupal\Core\Config\ImmutableConfig $config */
+    foreach ($configs as $config) {
+      $return[$config->get('id')] = $config->get('label');
+    }
+
+    return $return;
   }
 }
