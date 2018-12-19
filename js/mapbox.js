@@ -42,8 +42,8 @@
             "type": "circle",
             "source": "field",
             "paint": {
-              "circle-radius": 6,
-              "circle-color": "#B42222"
+              "circle-radius": 10,
+              "circle-color": "#fc4a1e"
             },
             "filter": ["==", "$type", "Point"],
           });
